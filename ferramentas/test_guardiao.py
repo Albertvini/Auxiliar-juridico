@@ -67,9 +67,36 @@ def test_gravacao_por_area(caminho, esperado):
     ("cp arquivo.txt ~/Documentos/", "deny"),
     ("git commit -F - <<'EOF'\nfluxo pesquisa -> a-conferir.md\nrm processos/x/autos/y.pdf\nEOF", "livre"),
     ("cat > conhecimento/nova.md <<'EOF'\nSúmula 999/STJ\nEOF", "deny"),
+    ("python3 ferramentas/donna_email.py --desde-dia-util-anterior", "livre"),
+    ("python3 -m pytest -q", "livre"),
+    ("set -e && python3 ferramentas/donna_dje.py", "livre"),
+    ("python3 - <<'EOF'\nimport urllib.request\nEOF", "deny"),
+    ("python3 processos/x/script.py", "deny"),
+    ("python3 -m http.server", "deny"),
+    ("python3", "deny"),
+    ("node -e 'fetch(1)'", "deny"),
+    ("bash -c 'curl https://x'", "deny"),
+    ("bash -c 'ls processos'", "livre"),
+    ("printenv", "deny"),
+    ("env", "deny"),
+    ("echo $DONNA_GMAIL_SENHA_APP", "deny"),
+    ("cat ~/.donna/credenciais.env", "deny"),
 ])
 def test_bash(comando, esperado):
     assert rodar("Bash", {"command": comando})[0] == esperado
+
+
+@pytest.mark.parametrize("ferramenta, entrada, esperado", [
+    ("Read", {"file_path": "/root/.donna/credenciais.env"}, "deny"),
+    ("Read", {"file_path": "/home/user/projeto/.env"}, "deny"),
+    ("Grep", {"pattern": "x", "path": "/root/.donna"}, "deny"),
+    ("Read", {"file_path": "conhecimento/sumulas-e-temas.md"}, "livre"),
+    ("mcp__Claude_Code_Remote__read_documentation", {}, "livre"),
+    ("mcp__Claude_Code_Remote__create_trigger", {}, "ask"),
+    ("mcp__Claude_Code_Remote__create_session", {}, "deny"),
+])
+def test_leitura_e_mcp(ferramenta, entrada, esperado):
+    assert rodar(ferramenta, entrada)[0] == esperado
 
 
 @pytest.mark.parametrize("url, esperado", [
@@ -77,6 +104,8 @@ def test_bash(comando, esperado):
     ("https://www.tjba.jus.br/jurisprudencia/", "livre"),
     ("https://www.jusbrasil.com.br/jurisprudencia/busca?q=rmc", "livre"),
     ("https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm", "livre"),
+    ("https://comunicaapi.pje.jus.br/api/v1/comunicacao?numeroOab=68210&ufOab=BA", "livre"),
+    ("https://comunica.pje.jus.br/consulta", "livre"),
     ("https://projudi.tjba.jus.br/projudi/", "deny"),
     ("https://pje.tjba.jus.br/pje/login.seam", "deny"),
     ("https://blog-qualquer.com/artigo", "deny"),

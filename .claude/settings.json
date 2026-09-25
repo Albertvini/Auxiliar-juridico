@@ -12,6 +12,8 @@
       "Bash(python3 ferramentas/painel_prazos.py:*)",
       "Bash(python3 ferramentas/verificar_citacoes.py:*)",
       "Bash(python3 ferramentas/extrair_texto.py:*)",
+      "Bash(python3 ferramentas/donna_dje.py:*)",
+      "Bash(python3 ferramentas/donna_email.py:*)",
       "Bash(pdftotext:*)",
       "Bash(ls:*)",
       "Bash(mkdir -p processos/:*)",
@@ -22,7 +24,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|WebFetch|WebSearch|Artifact|ArtifactData|ArtifactComments|mcp__.*",
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|Read|Grep|Glob|WebFetch|WebSearch|Artifact|ArtifactData|ArtifactComments|mcp__.*",
         "hooks": [
           {
             "type": "command",

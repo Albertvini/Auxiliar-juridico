@@ -7,9 +7,14 @@ PreToolUse
   advogado. Fora do projeto: bloqueado.
 - Bash: bloqueia rede fora das ferramentas de pesquisa (curl, wget, ssh...), envio de e-mail, git push forçado,
   git add -f (versionar dados de clientes), apagar documentos dos autos e gravar na base do agente pelo shell.
-- WebFetch: só domínios jurídicos/oficiais da lista abaixo; nunca PROJUDI nem URL com CPF.
+- Bash: só executa python dos scripts de ferramentas/ (e pytest); bloqueia código avulso (python -c, node,
+  perl...), e exibir variáveis de ambiente ou credenciais.
+- Read/Grep/Glob: bloqueia a leitura de credenciais (~/.donna/, *.env).
+- WebFetch: só domínios jurídicos/oficiais da lista abaixo; nunca PROJUDI/PJe (exceto o diário público DJEN)
+  nem URL com CPF.
 - WebSearch: bloqueia consultas com CPF, número de processo CNJ ou nome de cliente cadastrado nas fichas.
-- Ferramentas MCP e publicação de artefatos: bloqueadas (fora do escopo).
+- Ferramentas MCP e publicação de artefatos: bloqueadas (fora do escopo); exceções: leitura da documentação do
+  ambiente (livre) e rotinas agendadas (exigem confirmação do advogado).
 
 PostToolUse
 - Após gravar análise ou minuta em processos/<n>/(analises|minutas)/, roda o verificador de citações; havendo
@@ -49,6 +54,16 @@ CNJ = re.compile(r"\b\d{7}-?\d{2}\.?\d{4}\.?\d\.?\d{2}\.?\d{4}\b")
 
 COMANDOS_DE_REDE = {"curl", "wget", "ssh", "scp", "sftp", "rsync", "nc", "ncat", "netcat", "telnet", "ftp",
                     "mail", "mailx", "sendmail", "mutt", "aws", "gsutil", "rclone"}
+INTERPRETADORES = {"node", "nodejs", "deno", "bun", "perl", "ruby", "php", "lua", "osascript", "powershell", "pwsh"}
+MODULOS_PYTHON_PERMITIDOS = {"pytest", "json.tool", "py_compile"}
+# Diários públicos que o agente pode consultar mesmo estando em domínio do PJe.
+DIARIOS_PUBLICOS = {"comunicaapi.pje.jus.br", "comunica.pje.jus.br"}
+SEGREDOS = re.compile(r"DONNA_GMAIL_(?:SENHA|CLIENT_SECRET|REFRESH)|\.donna(?:/|\b|$)|credenciais\.env", re.I)
+# Ferramentas MCP de leitura inofensiva / que exigem a confirmação do advogado.
+MCP_LIVRES = {"mcp__Claude_Code_Remote__read_documentation"}
+MCP_COM_CONFIRMACAO = {f"mcp__Claude_Code_Remote__{n}" for n in
+                       ("create_trigger", "update_trigger", "delete_trigger", "get_trigger", "list_triggers",
+                        "fire_trigger", "send_later")}
 COMANDOS_QUE_GRAVAM = {"rm", "rmdir", "touch", "truncate", "chmod", "chown", "ln", "unlink", "shred"}
 
 
@@ -145,6 +160,9 @@ def checar_bash(comando: str, cwd: str) -> int:
         if motivo:
             return negar(motivo)
     for tokens in segmentos(comando):
+        if tokens[0] == "printenv" or (tokens[0] == "env" and all("=" in t or t.startswith("-")
+                                                                   for t in tokens[1:])):
+            return negar("exibir variáveis de ambiente ou credenciais não é permitido.")
         while tokens and ("=" in tokens[0] and not tokens[0].startswith("-") or tokens[0] in {"sudo", "env",
                                                                                                "nohup", "time"}):
             tokens = tokens[1:]
@@ -163,9 +181,23 @@ def checar_bash(comando: str, cwd: str) -> int:
                                      for t in tokens):
                 return negar("push forçado reescreve o histórico do repositório; fora do escopo.")
             continue
-        if prog in {"python", "python3"} and len(tokens) > 1 and tokens[1] == "-c" and \
-                re.search(r"open\(|write_text|unlink|rmtree|os\.remove", " ".join(tokens[2:])):
-            return negar("gravação de arquivos via 'python -c' não é permitida; use Write/Edit (rastreável).")
+        if prog in {"sh", "bash", "zsh"} and "-c" in tokens:
+            interno = tokens[tokens.index("-c") + 1] if tokens.index("-c") + 1 < len(tokens) else ""
+            resultado = checar_bash(interno, cwd)
+            if resultado or interno == "":
+                return resultado
+            continue
+        if prog in INTERPRETADORES:
+            return negar(f"execução de código avulso ('{prog}') não é permitida; o agente só roda as ferramentas "
+                         "de ferramentas/.")
+        if prog in {"python", "python3"} or re.fullmatch(r"python3\.\d+", prog):
+            motivo = checar_python(tokens[1:], cwd)
+            if motivo:
+                return negar(motivo)
+        if (prog in {"env", "printenv"} and len(tokens) <= 2) or (prog in {"set", "export", "declare"}
+                                                                   and len(tokens) == 1) or \
+                SEGREDOS.search(" ".join(tokens)):
+            return negar("exibir variáveis de ambiente ou credenciais não é permitido.")
         destinos: list[str] = []
         if prog in COMANDOS_QUE_GRAVAM:
             destinos = args
@@ -185,6 +217,25 @@ def checar_bash(comando: str, cwd: str) -> int:
             if motivo:
                 return negar(motivo)
     return 0
+
+
+def checar_python(args: list[str], cwd: str) -> str | None:
+    """Permite só os scripts de ferramentas/ e alguns módulos (pytest). Código avulso é bloqueado."""
+    i = 0
+    while i < len(args) and args[i].startswith("-") and args[i] not in {"-c", "-m", "-"}:
+        i += 1
+    if i >= len(args):
+        return "python interativo não é permitido."
+    if args[i] == "-m":
+        modulo = args[i + 1] if i + 1 < len(args) else ""
+        return None if modulo in MODULOS_PYTHON_PERMITIDOS else f"módulo python '{modulo}' não permitido."
+    if args[i] in {"-c", "-"}:
+        return ("execução de código python avulso não é permitida; o agente só roda os scripts de ferramentas/ "
+                "(para manutenção, use AUXILIAR_MANUTENCAO=1).")
+    script = resolver(args[i], cwd)
+    if relativo(script) is None or relativo(script)[0] != "ferramentas":
+        return f"só os scripts de ferramentas/ podem ser executados (pedido: {args[i]})."
+    return None
 
 
 def checar_destino_shell(destino: str, cwd: str) -> str | None:
@@ -208,7 +259,8 @@ def checar_webfetch(url: str) -> int:
     if not any(host == d or host.endswith("." + d) for d in DOMINIOS_PERMITIDOS):
         return negar(f"domínio '{host}' fora da lista de fontes jurídicas permitidas "
                      f"({', '.join(DOMINIOS_PERMITIDOS)}).")
-    if BLOQUEIO_URL.search(url):
+    alvo = url.replace(host, "") if host in DIARIOS_PUBLICOS else url
+    if BLOQUEIO_URL.search(alvo):
         return negar("acesso a sistemas processuais (PROJUDI/PJe/e-SAJ) ou URL com dados pessoais está fora do "
                      "escopo. O advogado baixa os documentos.")
     return 0
@@ -250,6 +302,15 @@ def pre(dados: dict) -> int:
         return checar_webfetch(entrada.get("url", ""))
     if ferramenta == "WebSearch":
         return checar_websearch(entrada.get("query", ""))
+    if ferramenta in {"Read", "Grep", "Glob"}:
+        alvo = entrada.get("file_path") or entrada.get("path") or ""
+        if SEGREDOS.search(alvo) or alvo.endswith(".env"):
+            return negar("leitura de credenciais não é permitida; elas são usadas só pelos scripts.")
+        return 0
+    if ferramenta in MCP_LIVRES:
+        return 0
+    if ferramenta in MCP_COM_CONFIRMACAO:
+        return perguntar(f"'{ferramenta}' cria ou altera uma rotina agendada. Aprove só se você pediu.")
     if ferramenta.startswith("mcp__") or ferramenta in {"Artifact", "ArtifactData", "ArtifactComments"}:
         return negar(f"'{ferramenta}' envia ou publica conteúdo em serviço externo; fora do escopo do agente.")
     return 0

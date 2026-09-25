@@ -1,0 +1,33 @@
+# Configuração da Donna — dados NÃO secretos.
+# Senhas e tokens NUNCA ficam aqui: veja o README, seção "Donna — configuração".
+
+[advogado]
+oab = "68210"
+uf = "BA"
+
+[dje]
+# DJEN = Diário de Justiça Eletrônico Nacional (CNJ), consultado pelo número da OAB.
+fontes = ["djen"]
+# Tribunais de interesse (vazio = todos). Publicações de outros tribunais são descartadas.
+tribunais = ["TJBA"]
+dias = 3
+# Também consulta os números dos processos cadastrados em processos/ (quando existirem).
+conferir_processos_cadastrados = true
+
+[email]
+conta = "adv.albertgoncalves@gmail.com"
+# "imap" no computador (senha de app) | "api" na nuvem (OAuth somente leitura)
+metodo = "imap"
+pasta_imap = "INBOX"
+dias = 3
+# SOMENTE e-mails destes remetentes (endereço exato) são lidos. Os demais são ignorados sem abrir.
+remetentes = [
+  "projudi@tjba.jus.br",
+  "pje@tjba.jus.br",
+  "responda@jusbrasil.com.br",
+]
+
+# Para os remetentes abaixo, além do endereço, o ASSUNTO precisa conter ao menos um dos termos
+# (comparação sem acento e em minúsculas). Descarta boletins e propaganda sem abrir o e-mail.
+[email.filtro_assunto]
+"responda@jusbrasil.com.br" = ["intima", "publica", "diario", "processo", "movimenta", "prazo", "comunica"]
