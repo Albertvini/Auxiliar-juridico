@@ -16,8 +16,11 @@ Trate do recurso no processo `$ARGUMENTS`.
    - se couber embargos antes do recurso (interrompem o prazo — art. 50), recomende a sequência.
    Se o tipo de recurso não foi informado e houver mais de uma opção razoável, apresente a recomendação ao
    usuário e aguarde a escolha antes de redigir.
-2. Delegue a redação ao subagente **redator-pecas** com o modelo correspondente:
+2. Se a reforma depender de precedente (ex.: valor do dano moral na Turma Recursal), acione **em paralelo**
+   o subagente **pesquisador-jurisprudencia** e repasse os marcadores `[A CONFERIR: ...]` ao redator.
+   Delegue a redação ao subagente **redator-pecas** com o modelo correspondente:
    `modelos/recurso-inominado.md`, `modelos/embargos-declaracao.md` ou `modelos/contrarrazoes-recurso-inominado.md`.
 3. Envie a minuta ao subagente **revisor-juridico**; aplique as correções CRÍTICO e IMPORTANTE.
 
-Entregue: caminho da minuta, vencimento, preparo/gratuidade, resumo dos fundamentos, pendências.
+Entregue: caminho da minuta, vencimento, preparo/gratuidade, resumo dos fundamentos, resultado do verificador de
+citações e pendências.

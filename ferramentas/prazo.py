@@ -10,7 +10,8 @@ Regras implementadas:
   disponibilização; prazo começa no primeiro dia útil seguinte à publicação.
 - Suspensão de 20/12 a 20/01 (CPC, art. 220) — ativada por padrão, desativável.
 - Feriados nacionais, feriados forenses móveis (Carnaval, Sexta-feira Santa, Corpus Christi), 2 de Julho
-  (Independência da Bahia), feriados municipais de Salvador e datas extras em feriados_extras.txt.
+  (Independência da Bahia), feriados municipais de Salvador (só com --comarca salvador) e as datas de
+  feriados_extras.txt — gerais ou por comarca, pontuais (AAAA-MM-DD) ou anuais (MM-DD).
 
 É uma ferramenta de apoio: suspensões de expediente, indisponibilidade do sistema e portarias do TJBA precisam
 ser conferidas no calendário oficial.
@@ -19,7 +20,8 @@ Uso:
     python3 ferramentas/prazo.py ciencia 2026-03-02 10
     python3 ferramentas/prazo.py envio 2026-03-02 10        # intimação tácita (sem leitura)
     python3 ferramentas/prazo.py dje 2026-03-02 5
-    python3 ferramentas/prazo.py ciencia 2026-03-02 10 --municipio outro --sem-recesso
+    python3 ferramentas/prazo.py ciencia 2026-03-02 10 --comarca feira-de-santana
+    python3 ferramentas/prazo.py ciencia 2026-03-02 10 --sem-recesso
 """
 
 from __future__ import annotations
@@ -51,7 +53,13 @@ def pascoa(ano: int) -> date:
     return date(ano, mes, dia)
 
 
-def feriados_do_ano(ano: int, municipio: str = "salvador") -> dict[date, str]:
+def normalizar_comarca(nome: str) -> str:
+    import unicodedata
+    sem_acento = "".join(c for c in unicodedata.normalize("NFD", nome) if unicodedata.category(c) != "Mn")
+    return "-".join(sem_acento.lower().replace("_", " ").split())
+
+
+def feriados_do_ano(ano: int, comarca: str = "salvador") -> dict[date, str]:
     p = pascoa(ano)
     feriados = {
         date(ano, 1, 1): "Confraternização Universal",
@@ -70,34 +78,51 @@ def feriados_do_ano(ano: int, municipio: str = "salvador") -> dict[date, str]:
     }
     if ano >= 2024:  # Lei 14.759/2023
         feriados[date(ano, 11, 20)] = "Dia Nacional de Zumbi e da Consciência Negra"
-    if municipio == "salvador":
+    if normalizar_comarca(comarca) == "salvador":
         feriados[date(ano, 6, 24)] = "São João (Salvador)"
         feriados[date(ano, 12, 8)] = "Nossa Senhora da Conceição da Praia (Salvador)"
     return feriados
 
 
-def carregar_extras(caminho: Path = ARQUIVO_EXTRAS) -> dict[date, str]:
-    """Lê datas extras (AAAA-MM-DD [# descrição]) — portarias de suspensão, feriados locais etc."""
-    extras: dict[date, str] = {}
+def carregar_extras(comarca: str = "salvador", caminho: Path = ARQUIVO_EXTRAS
+                    ) -> tuple[dict[date, str], dict[tuple[int, int], str]]:
+    """Lê feriados_extras.txt e devolve (datas pontuais, datas anuais) válidas para a comarca.
+
+    Formato de cada linha:  <AAAA-MM-DD | MM-DD> [@comarca] [# descrição]
+    Sem @comarca, a data vale para todas as comarcas.
+    """
+    pontuais: dict[date, str] = {}
+    anuais: dict[tuple[int, int], str] = {}
     if not caminho.exists():
-        return extras
+        return pontuais, anuais
+    alvo = normalizar_comarca(comarca)
     for n, linha in enumerate(caminho.read_text(encoding="utf-8").splitlines(), 1):
         conteudo, _, descricao = linha.partition("#")
-        conteudo = conteudo.strip()
-        if not conteudo:
+        partes = conteudo.split()
+        if not partes:
+            continue
+        descricao = descricao.strip() or "dia sem expediente (extra)"
+        restrita = [normalizar_comarca(p[1:]) for p in partes[1:] if p.startswith("@")]
+        if restrita and alvo not in restrita:
             continue
         try:
-            extras[date.fromisoformat(conteudo)] = descricao.strip() or "dia sem expediente (extra)"
+            if len(partes[0]) == 5:
+                mes, dia = (int(x) for x in partes[0].split("-"))
+                date(2000, mes, dia)  # valida
+                anuais[(mes, dia)] = descricao
+            else:
+                pontuais[date.fromisoformat(partes[0])] = descricao
         except ValueError:
-            print(f"aviso: {caminho.name}:{n} ignorada (data inválida: {conteudo!r})", file=sys.stderr)
-    return extras
+            print(f"aviso: {caminho.name}:{n} ignorada (data inválida: {partes[0]!r})", file=sys.stderr)
+    return pontuais, anuais
 
 
 @dataclass
 class Calendario:
-    municipio: str = "salvador"
+    comarca: str = "salvador"
     recesso: bool = True
     extras: dict[date, str] = field(default_factory=dict)
+    anuais: dict[tuple[int, int], str] = field(default_factory=dict)
     _cache: dict[int, dict[date, str]] = field(default_factory=dict, repr=False)
 
     def motivo_nao_util(self, d: date) -> str | None:
@@ -105,8 +130,10 @@ class Calendario:
             return DIAS_SEMANA[d.weekday()]
         if d in self.extras:
             return self.extras[d]
+        if (d.month, d.day) in self.anuais:
+            return self.anuais[(d.month, d.day)]
         if d.year not in self._cache:
-            self._cache[d.year] = feriados_do_ano(d.year, self.municipio)
+            self._cache[d.year] = feriados_do_ano(d.year, self.comarca)
         if d in self._cache[d.year]:
             return self._cache[d.year][d]
         if self.recesso and ((d.month == 12 and d.day >= 20) or (d.month == 1 and d.day <= 20)):
@@ -189,8 +216,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="ciencia = data da leitura; envio = data de envio (tácita); dje = disponibilização")
     parser.add_argument("data", help="data base no formato AAAA-MM-DD")
     parser.add_argument("dias", type=int, help="prazo em dias úteis (ex.: 5 embargos, 10 recurso inominado)")
-    parser.add_argument("--municipio", default="salvador", choices=["salvador", "outro"],
-                        help="inclui feriados municipais de Salvador (padrão) ou não")
+    parser.add_argument("--comarca", default="salvador",
+                        help="comarca do processo (padrão: salvador); define os feriados municipais aplicados")
     parser.add_argument("--sem-recesso", action="store_true",
                         help="não aplica a suspensão de 20/12 a 20/01")
     args = parser.parse_args(argv)
@@ -200,10 +227,16 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError:
         parser.error("data inválida; use AAAA-MM-DD")
 
-    cal = Calendario(municipio=args.municipio, recesso=not args.sem_recesso, extras=carregar_extras())
+    pontuais, anuais = carregar_extras(args.comarca)
+    cal = Calendario(comarca=args.comarca, recesso=not args.sem_recesso, extras=pontuais, anuais=anuais)
+    locais = [d for d in anuais] + [d for d in pontuais if d.year >= data_base.year]
+    if normalizar_comarca(args.comarca) != "salvador" and not locais:
+        print(f"ATENÇÃO: nenhum feriado municipal cadastrado para a comarca '{args.comarca}' em "
+              f"ferramentas/feriados_extras.txt. Cadastre-os (formato: MM-DD @{normalizar_comarca(args.comarca)} "
+              f"# descrição) ou confira manualmente.\n")
     r = calcular(args.modo, data_base, args.dias, cal)
 
-    print(f"PRAZO DE {r.dias} DIAS ÚTEIS")
+    print(f"PRAZO DE {r.dias} DIAS ÚTEIS — comarca: {args.comarca}")
     for i, passo in enumerate(r.passos, 1):
         print(f"  {i}. {passo}")
     if r.dias_pulados:

@@ -80,9 +80,9 @@ RMC `[VERIFICAR NO SITE DO TJBA]`.
 Temporais — SGS).
 
 **Teses:**
-- Tema 27/STJ: revisão quando a taxa destoa significativamente da média de mercado; a jurisprudência costuma
-  considerar abusivas taxas muito superiores à média (parâmetros de 1,5x a 3x aparecem nos precedentes — **não
-  há percentual fixo**; argumentar pelas peculiaridades do caso).
+- Tema 27/STJ: revisão quando a abusividade é cabalmente demonstrada; o parâmetro é a taxa média de mercado do
+  BACEN. **Não há percentual fixo na tese** — demonstrar em números a distância entre a taxa cobrada e a média.
+  Parâmetros numéricos só com precedente verificado: `[INSERIR PRECEDENTE SOBRE PARÂMETRO DE ABUSIVIDADE]`.
 - Súmula 530/STJ: sem contrato juntado, aplica-se a taxa média.
 - Capitalização: só se expressamente pactuada (Súmulas 539 e 541); sem contrato, afastar.
 - Comissão de permanência cumulada com outros encargos: nulidade (Súmulas 30 e 472).
@@ -112,8 +112,8 @@ repetida; "seguro", "título de capitalização", "clube de vantagens", "cartão
 
 ## 5. Negativação indevida
 
-**Teses:** dívida inexistente ou já paga → dano moral *in re ipsa* (entendimento consolidado do STJ para
-inscrição indevida); ausência de notificação prévia (CDC, art. 43, §2º; Súmula 359 — responsabilidade do
+**Teses:** dívida inexistente ou já paga → dano moral *in re ipsa* pela inscrição indevida
+`[INSERIR PRECEDENTE DO STJ VERIFICADO — busca: "inscrição indevida dano moral in re ipsa"]`; ausência de notificação prévia (CDC, art. 43, §2º; Súmula 359 — responsabilidade do
 órgão mantenedor); manutenção após pagamento além de 5 dias úteis (Súmula 548).
 
 **Atenção:** Súmula 385/STJ — levantar certidão/relatório completo dos cadastros **antes** de ajuizar e na réplica.

@@ -36,9 +36,18 @@ fazer a leitura técnica e adversarial da contestação do banco, para municiar 
    pedido, acordo, desistência parcial, conversa com o cliente.
 8. **Pedidos contrapostos / má-fé**: o banco pediu condenação do autor? Avaliar e preparar resposta.
 
+
+## Fontes (regra inegociável — ver CLAUDE.md, seção 1)
+
+Só cite o que está em `conhecimento/`, `jurisprudencia/indice.md` ou nos autos. Nenhuma afirmação do tipo
+"a jurisprudência entende"/"a Turma tem decidido" sem citação verificada no mesmo parágrafo. Precedente
+pesquisado e ainda não conferido: `[A CONFERIR: ...]`. Sem precedente: `[INSERIR PRECEDENTE ...]`.
+Depois de gravar, rode `python3 ferramentas/verificar_citacoes.py <arquivo>` e corrija até zerar os BLOQUEANTES.
+
 ## Saída
 
-Grave em `processos/<n>/analises/AAAA-MM-DD-analise-contestacao.md` com as seções acima, a tabela-mapa e, ao
+Comece o arquivo com **"Resumo em 30 segundos"**: a defesa é forte ou fraca, os 3 pontos decisivos e as provas
+a requerer. Grave em `processos/<n>/analises/AAAA-MM-DD-analise-contestacao.md` com as seções acima, a tabela-mapa e, ao
 final, **"Pendências para o advogado"** (perguntas a fazer ao cliente, documentos a obter). Atualize a ficha.
 
-Não cite precedente que não esteja na base `conhecimento/`. Não afirme fato que não esteja nos autos.
+Não afirme fato que não esteja nos autos.

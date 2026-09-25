@@ -37,8 +37,8 @@
   indisponibilidade do sistema é prorrogado para o primeiro dia útil seguinte (CPC, art. 224, §1º).
 - **Suspensão de 20 de dezembro a 20 de janeiro** (CPC, art. 220). A aplicação aos Juizados é tratada por ato
   do TJBA — `[VERIFICAR NORMA DO TJBA]` para o ano corrente.
-- **Não há prazo em dobro** para litisconsortes com procuradores diferentes nos Juizados (art. 229 CPC é
-  inaplicável segundo entendimento corrente — `[VERIFICAR]` se relevante).
+- **Não há prazo em dobro** para litisconsortes com procuradores diferentes nos Juizados (Enunciado 164/FONAJE
+  afasta o art. 229 do CPC — `[VERIFICAR redação vigente]`).
 - **Não há remessa necessária** nem prazo diferenciado para a instituição financeira privada.
 
 ### Intimação eletrônica (Lei 11.419/2006, art. 5º)
@@ -80,11 +80,11 @@ A ferramenta `ferramentas/prazo.py` implementa essas regras.
 
 ## 5. Execução / cumprimento de sentença
 
-- Cumprimento no próprio Juizado (art. 52). Multa do art. 523, §1º, CPC aplicável (entendimento prevalente) —
-  `[VERIFICAR]` enunciado do FONAJE vigente.
+- Cumprimento no próprio Juizado (art. 52). Aplicação da multa do art. 523, §1º, CPC:
+  `[VERIFICAR enunciado do FONAJE e precedente da Turma Recursal antes de pedir]`.
 - Pedir **bloqueio via SISBAJUD** diretamente quando o banco não paga no prazo.
-- Astreintes: atenção ao limite de alçada — entendimento prevalente é que a multa pode superar 40 SM, mas
-  pode ser reduzida (CPC, art. 537, §1º). `[VERIFICAR]` posição atual da Turma.
+- Astreintes: a multa pode ser revista pelo juízo (CPC, art. 537, §1º). Se o valor acumulado superar 40 SM,
+  `[INSERIR PRECEDENTE VERIFICADO sobre astreintes acima do teto do Juizado]` antes de sustentar a execução integral.
 
 ## 6. Checklist de peça para Juizado
 

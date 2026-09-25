@@ -23,8 +23,8 @@ que aconteceu, quanto tempo ele tem e o que deve fazer.
 3. **Resultado para o consumidor**: favorável, desfavorável ou parcial — por pedido (inexistência do débito,
    repetição simples/dobro, dano moral e valor, tutela, ônus da prova, honorários/má-fé).
 4. **Prazo**: providência cabível + prazo legal (com dispositivo) + cálculo com
-   `python3 ferramentas/prazo.py <ciencia|envio|dje> <AAAA-MM-DD> <dias>` (use `--municipio outro` se a comarca
-   não for Salvador). Transcreva o vencimento e o alerta de conferência do calendário do TJBA.
+   `python3 ferramentas/prazo.py <ciencia|envio|dje> <AAAA-MM-DD> <dias> --comarca <comarca da ficha>`. Se o
+   script avisar que não há feriado municipal cadastrado para a comarca, repita o aviso nas pendências. Transcreva o vencimento e o alerta de conferência do calendário do TJBA.
    Se a data de ciência não estiver disponível, calcule os dois cenários (leitura hoje e intimação tácita) e
    marque `[CONFIRMAR DATA DE CIÊNCIA NO PROJUDI]`.
 5. **Providências recomendadas**, em ordem de prioridade. Exemplos:
@@ -42,9 +42,18 @@ que aconteceu, quanto tempo ele tem e o que deve fazer.
 6. **Riscos e alertas**: deserção, preclusão, revelia, extinção por ausência, condenação em honorários se
    recurso for improvido (art. 55), litigância de má-fé.
 
+
+## Fontes (regra inegociável — ver CLAUDE.md, seção 1)
+
+Só cite o que está em `conhecimento/`, `jurisprudencia/indice.md` ou nos autos. Nenhuma afirmação do tipo
+"a jurisprudência entende"/"a Turma tem decidido" sem citação verificada no mesmo parágrafo. Precedente
+pesquisado e ainda não conferido: `[A CONFERIR: ...]`. Sem precedente: `[INSERIR PRECEDENTE ...]`.
+Depois de gravar, rode `python3 ferramentas/verificar_citacoes.py <arquivo>` e corrija até zerar os BLOQUEANTES.
+
 ## Saída
 
-Grave em `processos/<n>/analises/AAAA-MM-DD-intimacao-evento-<X>.md` com as seções acima e, ao final,
+Comece o arquivo com **"Resumo em 30 segundos"**: vencimento · ato · resultado para o consumidor · providência ·
+risco principal (até 5 linhas). Grave em `processos/<n>/analises/AAAA-MM-DD-intimacao-evento-<X>.md` com as seções acima e, ao final,
 **"Pendências para o advogado"**. Atualize a tabela de prazos e o histórico em `processos/<n>/ficha.md`.
 Na resposta final, entregue um resumo de no máximo 10 linhas começando pelo **vencimento do prazo**.
 

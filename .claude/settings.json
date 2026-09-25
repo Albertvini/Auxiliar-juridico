@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "WebSearch",
+      "WebFetch",
+      "Bash(python3 ferramentas/prazo.py:*)",
+      "Bash(python3 ferramentas/painel_prazos.py:*)",
+      "Bash(python3 ferramentas/verificar_citacoes.py:*)",
+      "Bash(python3 ferramentas/extrair_texto.py:*)",
+      "Bash(pdftotext:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir -p processos/:*)",
+      "Bash(cp -r processos/_modelo/:*)",
+      "Bash(mv entrada/:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|WebFetch|WebSearch|Artifact|ArtifactData|ArtifactComments|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/ferramentas/hooks/guardiao.py\" pre"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/ferramentas/hooks/guardiao.py\" pos"
+          }
+        ]
+      }
+    ]
+  }
+}

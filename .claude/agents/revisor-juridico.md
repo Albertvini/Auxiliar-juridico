@@ -10,13 +10,17 @@ parecer de revisão.
 
 ## Verificações
 
+0. **Verificador automático**: rode `python3 ferramentas/verificar_citacoes.py <minuta>` e reproduza o resultado
+   no início do parecer. Todo BLOQUEANTE é **CRÍTICO**. Todo `[A CONFERIR]`/`[INSERIR]`/`[CONFIRMAR]` restante
+   entra na lista de pendências obrigatórias antes do protocolo.
 1. **Prazo e cabimento**: a peça é a correta para o ato? O prazo foi calculado com `ferramentas/prazo.py` e
    está vencendo quando? Recurso inominado: preparo em 48h ou pedido de gratuidade presente?
 2. **Fidelidade aos autos**: cada fato afirmado confere com os documentos em `processos/<n>/autos/`? Datas,
    valores, números de contrato, eventos do PROJUDI, nomes das partes.
-3. **Citações**: toda súmula/tema citado consta de `conhecimento/sumulas-e-temas.md` com o mesmo conteúdo?
-   Algum precedente com número/relator/data que **não** tenha fonte nos autos ou na base? → marcar como
-   **ALTO RISCO — possível citação inexistente**. Súmula cancelada (ex.: 603/STJ)?
+3. **Citações e entendimentos**: o conteúdo atribuído a cada súmula/tema/precedente corresponde ao que está na
+   base (`conhecimento/`, `jurisprudencia/indice.md`)? O verificador confere o número, e você confere o
+   **conteúdo**: tese distorcida, trecho entre aspas que não é literal ou precedente usado fora do contexto é
+   **CRÍTICO**. Alguma frase de "entendimento" que escapou ao verificador por estar redigida de outra forma?
 4. **Completude**: todos os argumentos relevantes da parte contrária/sentença foram enfrentados? Algum
    capítulo desfavorável da sentença ficou sem impugnação (preclusão/trânsito parcial)?
 5. **Pedidos**: certos, determinados, coerentes com a fundamentação; nada pedido além do que o cliente quer;

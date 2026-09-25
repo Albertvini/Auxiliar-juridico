@@ -21,8 +21,13 @@ minutas técnicas, objetivas e persuasivas para revisão do advogado titular.
 - Cada tópico: fato dos autos (com evento do PROJUDI) → norma → aplicação ao caso → conclusão.
 - Enfrente **todos** os argumentos da peça adversária que possam influenciar o julgamento, na ordem de
   relevância, sem repetir argumentos fracos do banco além do necessário.
-- Citação de súmulas/temas **apenas** de `conhecimento/sumulas-e-temas.md`. Precedentes locais:
-  `[INSERIR PRECEDENTE DA TURMA RECURSAL SOBRE <tema> — sugestão de busca: "<termos>"]`.
+- Citações **apenas** das fontes verificadas: `conhecimento/`, `jurisprudencia/indice.md` e os autos.
+  Precedente pesquisado e ainda não conferido: `[A CONFERIR: <classe e número> — <link> — trecho: "..."]`.
+  Sem precedente: `[INSERIR PRECEDENTE DA TURMA RECURSAL SOBRE <tema> — sugestão de busca: "<termos>"]`.
+- Nenhuma frase atribuindo entendimento a tribunal ("a jurisprudência é pacífica", "a Turma tem entendido")
+  sem citação verificada no mesmo parágrafo. Prefira argumentar pela lei e pelos fatos, que não dependem de
+  precedente.
+- Nunca coloque entre aspas um texto que você não copiou literalmente da fonte.
 - Dados ausentes: `[CONFIRMAR: ...]`. Nunca preencha com suposições.
 - Extensão compatível com o Juizado: impugnação 4-10 páginas; recurso inominado 8-15 páginas; embargos
   2-4 páginas. Qualidade acima de volume.
@@ -44,8 +49,10 @@ minutas técnicas, objetivas e persuasivas para revisão do advogado titular.
 
 ## Saída
 
-Grave em `processos/<n>/minutas/AAAA-MM-DD-<tipo>.md`. Ao final da minuta, **fora do corpo da peça**, inclua:
+Grave em `processos/<n>/minutas/AAAA-MM-DD-<tipo>.md` e rode
+`python3 ferramentas/verificar_citacoes.py <arquivo>`. Corrija até zerar os BLOQUEANTES, removendo o trecho ou
+convertendo-o em pendência, **nunca** alterando a citação para "parecer" válida. Ao final da minuta, **fora do corpo da peça**, inclua:
 - **Checklist de protocolo** (prazo e vencimento, preparo/gratuidade, documentos a anexar, assinatura digital);
-- **Pendências para o advogado** (todos os `[CONFIRMAR]` e `[INSERIR]` listados).
+- **Pendências para o advogado** (todos os `[CONFIRMAR]`, `[INSERIR]` e `[A CONFERIR]` listados).
 
 Atualize a ficha (histórico e próximos passos).

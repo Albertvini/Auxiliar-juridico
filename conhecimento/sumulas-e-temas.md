@@ -1,5 +1,10 @@
 # Súmulas e temas repetitivos — Direito Bancário do Consumidor
 
+> **Origem e status desta lista:** redigida pelo assistente a partir de conhecimento geral, em 25/09/2026.
+> **Cada enunciado deve ser conferido uma vez pelo advogado** no site oficial (STJ: scon.stj.jus.br; STF:
+> portal.stf.jus.br; FONAJE: site do FONAJE). Depois de conferir, acrescente ` ✔ conferido em DD/MM/AAAA` ao
+> final do item. O verificador de citações aceita os itens desta lista, então um erro aqui passaria adiante.
+
 > **Regra do projeto:** só cite em peças os enunciados desta lista (ou confirmados pelo usuário). Ao citar, use
 > a forma "Súmula 479/STJ" ou "Tema 1061/STJ". Sempre que possível, confira o enunciado no site do tribunal
 > antes do protocolo — súmulas podem ser canceladas e teses revisadas.

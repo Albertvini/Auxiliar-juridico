@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from prazo import Calendario, calcular, pascoa
+from prazo import Calendario, calcular, carregar_extras, pascoa
 
 
 @pytest.fixture
@@ -61,9 +61,9 @@ def test_pula_dois_de_julho(cal):
     assert r.vencimento == date(2026, 7, 6)
 
 
-def test_feriado_de_salvador_so_quando_municipio_salvador():
+def test_feriado_de_salvador_so_na_comarca_de_salvador():
     salvador = calcular("ciencia", date(2026, 6, 22), 2, Calendario(extras={}))
-    outro = calcular("ciencia", date(2026, 6, 22), 2, Calendario(municipio="outro", extras={}))
+    outro = calcular("ciencia", date(2026, 6, 22), 2, Calendario(comarca="feira-de-santana", extras={}))
     assert salvador.vencimento == date(2026, 6, 25)
     assert outro.vencimento == date(2026, 6, 24)
 
@@ -87,3 +87,20 @@ def test_datas_extras_sao_respeitadas():
 def test_prazo_invalido(cal):
     with pytest.raises(ValueError):
         calcular("ciencia", date(2026, 3, 2), 0, cal)
+
+
+def test_feriados_extras_por_comarca_e_anuais(tmp_path):
+    arquivo = tmp_path / "extras.txt"
+    arquivo.write_text(
+        "2026-03-04  # portaria geral\n"
+        "08-15 @Feira-de-Santana  # feriado municipal anual\n"
+        "08-16 @ilheus  # outra comarca\n"
+        "data-ruim\n",
+        encoding="utf-8",
+    )
+    pontuais, anuais = carregar_extras("feira-de-santana", arquivo)
+    assert pontuais == {date(2026, 3, 4): "portaria geral"}
+    assert anuais == {(8, 15): "feriado municipal anual"}
+    cal = Calendario(comarca="feira-de-santana", extras=pontuais, anuais=anuais)
+    assert not cal.eh_util(date(2028, 8, 15))  # terça-feira, feriado anual da comarca
+    assert cal.eh_util(date(2026, 6, 24))  # São João de Salvador não se aplica

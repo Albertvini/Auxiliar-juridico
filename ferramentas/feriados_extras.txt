@@ -1,7 +1,13 @@
 # Datas sem expediente forense ou com prazos suspensos que NÃO estão no cálculo automático.
-# Formato: AAAA-MM-DD  # descrição
-# Inclua aqui portarias do TJBA de suspensão de prazos, indisponibilidade do PROJUDI,
-# feriados municipais de comarcas do interior e pontos facultativos decretados.
 #
-# Exemplo:
+# Formato:  <AAAA-MM-DD | MM-DD>  [@comarca]  [# descrição]
+#   AAAA-MM-DD  = data pontual (portaria de suspensão, indisponibilidade do PROJUDI, ponto facultativo)
+#   MM-DD       = repete todo ano (feriado municipal da comarca)
+#   @comarca    = vale só para essa comarca (ex.: @feira-de-santana, @vitoria-da-conquista); sem @, vale para todas
+#
+# O cálculo automático já inclui: feriados nacionais, Carnaval, Sexta-feira Santa, Corpus Christi,
+# 2 de Julho, 20 de novembro e, para @salvador, 24/06 e 08/12. Confira sempre o calendário do TJBA.
+#
+# Exemplos (remova o # do início para ativar, depois de conferir a data):
 # 2026-02-18  # Quarta-feira de Cinzas — conferir portaria do TJBA
+# MM-DD @nome-da-comarca  # feriado municipal (padroeiro, emancipação política)

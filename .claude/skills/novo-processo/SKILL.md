@@ -11,9 +11,11 @@ Cadastre o processo `$ARGUMENTS`.
 2. Se o usuário indicou documentos, mova/copie-os para `autos/`, renomeando como
    `evento-<NN>-<descricao>.pdf` quando o número do evento do PROJUDI for identificável.
 3. Rode `python3 ferramentas/extrair_texto.py processos/<n>/autos`.
-4. Leia a inicial e demais peças disponíveis e preencha `ficha.md`: partes, juízo/comarca, matéria (conforme
+4. Leia a inicial e demais peças disponíveis e preencha `ficha.md`: partes, juízo, **comarca (para prazos)**, matéria (conforme
    `conhecimento/teses-por-materia.md`), contratos discutidos, pedidos e valores, tutela, fase atual, histórico
    de eventos, prazos em aberto. Campos desconhecidos: `[CONFIRMAR]`.
+   Se a comarca não for Salvador e não houver feriados dela em `ferramentas/feriados_extras.txt`, avise o
+   advogado e peça as datas (padroeiro, emancipação), sem inventá-las.
 5. Se houver intimação pendente ou contestação sem análise, diga ao usuário e sugira `/analisar-intimacao` ou
    `/analisar-contestacao`.
 

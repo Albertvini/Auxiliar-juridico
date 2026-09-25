@@ -5,6 +5,7 @@
 | Campo | Valor |
 |---|---|
 | Juízo | [Nº]º Juizado Especial Cível [de Defesa do Consumidor] — Comarca de [ ] |
+| Comarca (para prazos) | [salvador / nome-da-comarca] |
 | Sistema | PROJUDI/TJBA |
 | Autor (cliente) | [nome] — [idoso? analfabeto? aposentado INSS NB ___?] |
 | Réu(s) | [banco / financeira / correspondente] |
