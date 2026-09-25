@@ -1,0 +1,21 @@
+# Documentos de clientes e processos: sigilo profissional (EOAB, art. 7º, II) e LGPD.
+# Nada dentro de processos/ é versionado, exceto o README e a pasta-modelo.
+processos/*
+!processos/README.md
+!processos/_modelo/
+!processos/_modelo/**
+
+# Arquivos soltos que possam conter dados de clientes
+*.pdf
+*.docx
+*.odt
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Sistema
+.DS_Store
+Thumbs.db

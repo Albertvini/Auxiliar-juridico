@@ -1,0 +1,7 @@
+# Datas sem expediente forense ou com prazos suspensos que NÃO estão no cálculo automático.
+# Formato: AAAA-MM-DD  # descrição
+# Inclua aqui portarias do TJBA de suspensão de prazos, indisponibilidade do PROJUDI,
+# feriados municipais de comarcas do interior e pontos facultativos decretados.
+#
+# Exemplo:
+# 2026-02-18  # Quarta-feira de Cinzas — conferir portaria do TJBA
