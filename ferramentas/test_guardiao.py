@@ -127,6 +127,21 @@ def test_mcp_e_publicacao_bloqueados():
     assert rodar("Artifact", {"file_path": "x.html"})[0] == "deny"
 
 
+def test_entrada_invalida_bloqueia_por_seguranca():
+    env = {k: v for k, v in os.environ.items() if k != "AUXILIAR_MANUTENCAO"}
+    r = subprocess.run([sys.executable, str(GUARDIAO), "pre"], input=b"{nao e json", capture_output=True, env=env)
+    assert json.loads(r.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+def test_acentos_em_utf8_nao_derrubam_o_guardiao():
+    env = {k: v for k, v in os.environ.items() if k != "AUXILIAR_MANUTENCAO"}
+    env.update({"CLAUDE_PROJECT_DIR": str(RAIZ), "PYTHONIOENCODING": "cp1252"})
+    dados = json.dumps({"tool_name": "Write", "tool_input": {"file_path": "conhecimento/ÁÉÍ—ção.md"},
+                        "cwd": str(RAIZ)}, ensure_ascii=False).encode("utf-8")
+    r = subprocess.run([sys.executable, str(GUARDIAO), "pre"], input=dados, capture_output=True, env=env)
+    assert json.loads(r.stdout)["hookSpecificOutput"]["permissionDecision"] == "ask"
+
+
 def test_modo_manutencao_libera():
     assert rodar("Write", {"file_path": "CLAUDE.md"}, env_extra={"AUXILIAR_MANUTENCAO": "1"})[0] == "livre"
 

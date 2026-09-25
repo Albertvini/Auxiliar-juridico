@@ -70,7 +70,7 @@ COMANDOS_QUE_GRAVAM = {"rm", "rmdir", "touch", "truncate", "chmod", "chown", "ln
 # ---------------------------------------------------------------------------------------------- respostas
 def decidir(decisao: str, motivo: str) -> int:
     print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": decisao,
-                                             "permissionDecisionReason": motivo}}, ensure_ascii=False))
+                                             "permissionDecisionReason": motivo}}, ensure_ascii=True))
     return 0
 
 
@@ -325,7 +325,8 @@ def pos(dados: dict) -> int:
             and caminho.suffix == ".md"):
         return 0
     verificador = RAIZ / "ferramentas" / "verificar_citacoes.py"
-    r = subprocess.run([sys.executable, str(verificador), str(caminho)], capture_output=True, text=True)
+    r = subprocess.run([sys.executable, str(verificador), str(caminho)], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     if r.returncode == 1:
         print(r.stdout + "\nCORRIJA AGORA: remova cada citação/afirmação BLOQUEANTE ou transforme-a em pendência "
               "([INSERIR PRECEDENTE ...] / [A CONFERIR: link]). Não crie nem 'ajuste' citações para passar no "
@@ -335,14 +336,21 @@ def pos(dados: dict) -> int:
 
 
 def main() -> int:
+    # No Windows a saída pode não ser UTF-8; acentos não podem derrubar o guardião.
+    for fluxo in (sys.stdout, sys.stderr):
+        fluxo.reconfigure(encoding="utf-8", errors="replace")
     if os.environ.get("AUXILIAR_MANUTENCAO") == "1":
         return 0
     modo = sys.argv[1] if len(sys.argv) > 1 else "pre"
     try:
-        dados = json.load(sys.stdin)
-    except json.JSONDecodeError:
-        return 0
-    return pos(dados) if modo == "pos" else pre(dados)
+        dados = json.loads(sys.stdin.buffer.read().decode("utf-8", errors="replace"))
+        return pos(dados) if modo == "pos" else pre(dados)
+    except Exception as erro:  # noqa: BLE001 — na dúvida, bloqueia (falha fechada)
+        if modo == "pos":
+            print(f"[Guardião] falha interna na verificação de citações ({erro}); rode "
+                  "ferramentas/verificar_citacoes.py manualmente.", file=sys.stderr)
+            return 2
+        return negar(f"falha interna do guardião ({type(erro).__name__}); ação bloqueada por segurança.")
 
 
 if __name__ == "__main__":
